@@ -1,0 +1,15 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brave Home</title><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+body{background:center/cover no-repeat;transition:background-image 1s}
+</style></head><body><script>
+(async()=>{try{
+const c=await fetch("config.json?x="+Date.now()).then(r=>r.json());
+const u=`https://api.github.com/repos/${c.github_user}/${c.github_repo}/contents/${c.images_folder}`;
+const f=await fetch(u+"?x="+Date.now()).then(r=>r.json());
+const a=f.filter(x=>x.type==="file"&&/\.(jpe?g|png|webp|gif)$/i.test(x.name)).map(x=>x.download_url);
+if(!a.length)throw 0; let i=Math.floor(Math.random()*a.length);
+document.body.style.backgroundImage=`url("${a[i]}")`;
+}catch(e){document.body.style.background="#000"}})();
+</script></body></html>
