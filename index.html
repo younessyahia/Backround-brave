@@ -4,17 +4,22 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 body{background:center/cover no-repeat;transition:background-image 1s}
 </style></head><body><script>
-(async()=>{try{
-const c=await fetch("config.json?x="+Date.now()).then(r=>r.json());
-const u=`https://api.github.com/repos/${c.github_user}/${c.github_repo}/contents/${c.images_folder}`;
-const f=await fetch(u+"?x="+Date.now()).then(r=>r.json());
-const a=f.filter(x=>x.type==="file"&&/\.(jpe?g|png|webp|gif)$/i.test(x.name))
- .sort((p,q)=>p.name.localeCompare(q.name,undefined,{numeric:true}))
- .map(x=>x.download_url);
-if(!a.length)throw 0;
-let i=parseInt(localStorage.getItem("bgIndex")||"-1",10)+1;
-if(i>=a.length||i<0)i=0;
-localStorage.setItem("bgIndex",i);
-document.body.style.backgroundImage=`url("${a[i]}")`;
-}catch(e){document.body.style.background="#000"}})();
+(async()=>{
+const dir="images/", exts=["jpg","jpeg","png","webp","gif"];
+const pad=n=>String(n).padStart(2,"0");
+const exists=u=>new Promise(r=>{const m=new Image();m.onload=()=>r(1);m.onerror=()=>r(0);m.src=u});
+async function find(n){
+  for(const name of [String(n),pad(n)])
+    for(const e of exts){const u=`${dir}${name}.${e}`;if(await exists(u))return u}
+  return null;
+}
+try{
+  let i=parseInt(localStorage.getItem("bgIndex")||"0",10)+1;
+  let u=await find(i);
+  if(!u){i=1;u=await find(1)}
+  if(!u)throw 0;
+  localStorage.setItem("bgIndex",i);
+  document.body.style.backgroundImage=`url("${u}")`;
+}catch(e){document.body.style.background="#000"}
+})();
 </script></body></html>
