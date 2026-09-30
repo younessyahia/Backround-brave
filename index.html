@@ -8,8 +8,13 @@ body{background:center/cover no-repeat;transition:background-image 1s}
 const c=await fetch("config.json?x="+Date.now()).then(r=>r.json());
 const u=`https://api.github.com/repos/${c.github_user}/${c.github_repo}/contents/${c.images_folder}`;
 const f=await fetch(u+"?x="+Date.now()).then(r=>r.json());
-const a=f.filter(x=>x.type==="file"&&/\.(jpe?g|png|webp|gif)$/i.test(x.name)).map(x=>x.download_url);
-if(!a.length)throw 0; let i=Math.floor(Math.random()*a.length);
+const a=f.filter(x=>x.type==="file"&&/\.(jpe?g|png|webp|gif)$/i.test(x.name))
+ .sort((p,q)=>p.name.localeCompare(q.name,undefined,{numeric:true}))
+ .map(x=>x.download_url);
+if(!a.length)throw 0;
+let i=parseInt(localStorage.getItem("bgIndex")||"-1",10)+1;
+if(i>=a.length||i<0)i=0;
+localStorage.setItem("bgIndex",i);
 document.body.style.backgroundImage=`url("${a[i]}")`;
 }catch(e){document.body.style.background="#000"}})();
 </script></body></html>
